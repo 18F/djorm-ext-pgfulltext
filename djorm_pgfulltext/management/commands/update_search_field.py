@@ -4,7 +4,7 @@ Update search fields.
 from __future__ import print_function
 from django.core.management.base import BaseCommand, CommandError
 from django.core.exceptions import ImproperlyConfigured
-from django.db import models
+from django.apps import apps
 
 
 class Command(BaseCommand):
@@ -18,7 +18,7 @@ class Command(BaseCommand):
         # check application
 
         try:
-            app_module = models.get_app(app)
+            app_obj = apps.get_app_config(app)
         except ImproperlyConfigured:
             raise CommandError("There is no enabled application matching '%s'." % app)
 
@@ -27,13 +27,13 @@ class Command(BaseCommand):
         # get models
 
         if model:
-            m = models.get_model(app, model)
+            m = app_obj.models.get(model.lower())
             if not m:
                 raise CommandError("There is no model '%s'." % model)
 
-            app_models.append(models.get_model(app, model))
+            app_models.append(m)
         else:
-            app_models += models.get_models(app_module)
+            app_models += app_obj.models.values()
 
         # get models only with search managers
 
