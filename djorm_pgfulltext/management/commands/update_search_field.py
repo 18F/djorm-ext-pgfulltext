@@ -11,6 +11,10 @@ class Command(BaseCommand):
     help = 'Update search fields'
     args = "appname [model]"
 
+    def add_arguments(self, parser):
+        parser.add_argument('app', type=str)
+        parser.add_argument('model', type=str)
+
     def handle(self, app=None, model=None, **options):
         if not app:
             raise CommandError("You must provide an app to update search fields.")
